@@ -71,32 +71,31 @@ int main()
     int total = width * height * 3;
     unsigned char* p2_inv = new unsigned char[total];
 
-    // Paso 1: P2 = I_D XOR I_M
+    // funcion para aplicar XOR
     for (int i = 0; i < total; i++) {
         p2_inv[i] = id[i] ^ im[i];
     }
 
-    unsigned char* dspzar = new unsigned char[total];
+    unsigned char* dsplzar = new unsigned char[total];
 
     // Función para desplazar
     auto desplazar = [](unsigned char b) {
         return b << 0;
     };
 
-    // Paso 2: P1 = rotar izquierda 3 bits
     for (int i = 0; i < total; i++) {
-        dspzar[i] = desplazar(id[i]);
+        dsplzar[i] = desplazar(p2_inv[i]);
     }
 
     unsigned char* p1_inv = new unsigned char[total];
 
     // Función para rotar
     auto rotar = [](unsigned char b) {
-        return b << 3 | (b >> 5);
+        return b << 2 | (b >> 6);
     };
 
     for (int i = 0; i < total; i++) {
-        p1_inv[i] = rotar(id[i]);
+        p1_inv[i] = rotar(dsplzar[i]);
     }
 
     unsigned char* io = new unsigned char[total];
@@ -105,8 +104,64 @@ int main()
         io[i] = p1_inv[i] ^ im[i];
     }
 
+    unsigned char* dsplzar2 = new unsigned char[total];
+
+    // Función para desplazar
+    auto desplazar2 = [](unsigned char b) {
+        return b << 0;
+    };
+
+    for (int i = 0; i < total; i++) {
+        dsplzar2[i] = desplazar2(io[i]);
+    }
+
+    unsigned char* p1_inv2 = new unsigned char[total];
+
+    // Función para rotar
+    auto rotar2 = [](unsigned char b) {
+        return b << 5 | (b >> 3);
+    };
+
+    for (int i = 0; i < total; i++) {
+        p1_inv2[i] = rotar2(dsplzar2[i]);
+    }
+
+    unsigned char* io2 = new unsigned char[total];
+
+    for (int i = 0; i < total; i++) {
+        io2[i] = p1_inv2[i] ^ im[i];
+    }
+
+    unsigned char* dsplzar3 = new unsigned char[total];
+
+    // Función para desplazar
+    auto desplazar3 = [](unsigned char b) {
+        return b >> 0;
+    };
+
+    for (int i = 0; i < total; i++) {
+        dsplzar3[i] = desplazar3(io2[i]);
+    }
+
+    unsigned char* p1_inv3 = new unsigned char[total];
+
+    // Función para rotar
+    auto rotar3 = [](unsigned char b) {
+        return b << 4 | (b >> 4);
+    };
+
+    for (int i = 0; i < total; i++) {
+        p1_inv3[i] = rotar3(dsplzar3[i]);
+    }
+
+    unsigned char* io3 = new unsigned char[total];
+
+    for (int i = 0; i < total; i++) {
+        io3[i] = p1_inv3[i] ^ im[i];
+    }
+
     // Exporta la imagen modificada a un nuevo archivo BMP
-    bool exportI = exportImage(p1_inv, width, height, archivoSalida);
+    bool exportI = exportImage(io3, width, height, archivoSalida);
 
     // Muestra si la exportación fue exitosa (true o false)
     cout << exportI << endl;
@@ -125,7 +180,7 @@ int main()
     // Carga M1.txt (semilla y valores enmascarados)
     int seed = 0;
     int n_pixels = 0;
-    unsigned int *maskingData = loadSeedMasking("M6.txt", seed, n_pixels);
+    unsigned int *maskingData = loadSeedMasking("M0.txt", seed, n_pixels);
     if (!maskingData) {
         cout << " No se pudo leer M1.txt\n";
         return -1;
@@ -134,7 +189,7 @@ int main()
     // Compara S(k) = IN[k + seed] + M[k]
     bool match = true;
     for (int i = 0; i < n_pixels * 3; ++i) {
-        int suma = int(p1_inv[seed + i]) + int(mask[i]);
+        int suma = int(io3[seed + i]) + int(mask[i]);
         if (suma != int(maskingData[i])) {
             cout << " Diferencia en byte " << i
                  << ": esperado " << maskingData[i]
@@ -161,8 +216,14 @@ int main()
     delete[] im;
     delete[] p2_inv;
     delete[] p1_inv;
+    delete[] p1_inv2;
+    delete[] p1_inv3;
     delete[] io;
-    delete[] dspzar;
+    delete[] io2;
+    delete[] io3;
+    delete[] dsplzar;
+    delete[] dsplzar2;
+    delete[] dsplzar3;
     delete[] mask;
     delete[] maskingData;
 
