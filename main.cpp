@@ -44,40 +44,49 @@ unsigned int* loadSeedMasking(const char* nombreArchivo, int &seed, int &n_pixel
 int main()
 {
     // Definición de rutas de archivo de entrada (imagen original) y salida (imagen modificada)
-    QString archivoEntrada = "I_O.bmp";
-    QString archivoSalida = "I_D.bmp";
+    QString archivoID = "I_D.bmp";
+    QString archivoIM = "I_M.bmp";
+    QString archivoSalida = "I_N.bmp";
 
     // Variables para almacenar las dimensiones de la imagen
     int height = 0;
     int width = 0;
 
     // Carga la imagen BMP en memoria dinámica y obtiene ancho y alto
-    unsigned char *pixelData = loadPixels(archivoEntrada, width, height);
+    unsigned char *id = loadPixels(archivoID, width, height);
 
-    // Simula una modificación de la imagen asignando valores RGB incrementales
-    // (Esto es solo un ejemplo de manipulación artificial)
-    for (int i = 0; i < width * height * 3; i += 3) {
-        pixelData[i] = i;     // Canal rojo
-        pixelData[i + 1] = i; // Canal verde
-        pixelData[i + 2] = i; // Canal azul
+    // Variables para almacenar las dimensiones de la imagen
+    int height2 = 0;
+    int width2 = 0;
+
+    // Carga la imagen BMP en memoria dinámica y obtiene ancho y alto
+    unsigned char *im = loadPixels(archivoIM, width, height);
+
+
+    int total = width * height * 3;
+    unsigned char* p2_inv = new unsigned char[total];
+
+    // Paso 1: P2 = I_D XOR I_M
+    for (int i = 0; i < total; i++) {
+        p2_inv[i] = id[i] ^ im[i];
     }
 
     // Exporta la imagen modificada a un nuevo archivo BMP
-    bool exportI = exportImage(pixelData, width, height, archivoSalida);
+    bool exportI = exportImage(p2_inv, width, height, archivoSalida);
 
     // Muestra si la exportación fue exitosa (true o false)
     cout << exportI << endl;
 
     // Libera la memoria usada para los píxeles
-    delete[] pixelData;
-    pixelData = nullptr;
+    delete[] id;
+    delete[] p2_inv;
 
     // Variables para almacenar la semilla y el número de píxeles leídos del archivo de enmascaramiento
     int seed = 0;
     int n_pixels = 0;
 
     // Carga los datos de enmascaramiento desde un archivo .txt (semilla + valores RGB)
-    unsigned int *maskingData = loadSeedMasking("M1.txt", seed, n_pixels);
+    unsigned int *maskingData = loadSeedMasking("M6.txt", seed, n_pixels);
 
     // Muestra en consola los primeros valores RGB leídos desde el archivo de enmascaramiento
     for (int i = 0; i < n_pixels * 3; i += 3) {
@@ -267,16 +276,3 @@ unsigned int* loadSeedMasking(const char* nombreArchivo, int &seed, int &n_pixel
     // Retornar el puntero al arreglo con los datos RGB
     return RGB;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
