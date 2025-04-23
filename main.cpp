@@ -44,8 +44,8 @@ unsigned int* loadSeedMasking(const char* nombreArchivo, int &seed, int &n_pixel
 int main()
 {
     // Definición de rutas de archivo de entrada (imagen original) y salida (imagen modificada)
-    QString archivoID = "I_D.bmp";
-    QString archivoIM = "I_M.bmp";
+    QString imagenID = "I_D.bmp";
+    QString imagenIM = "I_M";
     QString archivoSalida = "I_N.bmp";
 
     // Variables para almacenar las dimensiones de la imagen
@@ -53,15 +53,20 @@ int main()
     int width = 0;
 
     // Carga la imagen BMP en memoria dinámica y obtiene ancho y alto
-    unsigned char *id = loadPixels(archivoID, width, height);
+    unsigned char *id = loadPixels(imagenID, width, height);
+    if (!id) {
+        cout << " No se pudo encontrar la imagen \n";
+        return -1;
+    }
 
-    // Variables para almacenar las dimensiones de la imagen
     int height2 = 0;
     int width2 = 0;
 
-    // Carga la imagen BMP en memoria dinámica y obtiene ancho y alto
-    unsigned char *im = loadPixels(archivoIM, width, height);
-
+    unsigned char *im = loadPixels(imagenIM, width2, height2);
+    if (!im) {
+        cout << " No se pudo encontrar la imagen \n";
+        return -1;
+    }
 
     int total = width * height * 3;
     unsigned char* p2_inv = new unsigned char[total];
@@ -71,23 +76,68 @@ int main()
         p2_inv[i] = id[i] ^ im[i];
     }
 
+    unsigned char* p1_inv = new unsigned char[total];
+
+    // Función para rotar a la izquierda 3 bits
+    auto rotarIzq3 = [](unsigned char b) {
+        return (b << 3) | (b >> 5);
+    };
+
+    // Paso 2: P1 = rotar izquierda 3 bits
+    for (int i = 0; i < total; i++) {
+        p1_inv[i] = rotarIzq3(p2_inv[i]);
+    }
+
+    unsigned char* io = new unsigned char[total];
+
+    // Paso 3: I_O = P1 XOR I_M
+    for (int i = 0; i < total; i++) {
+        io[i] = p1_inv[i] ^ im[i];
+    }
+
     // Exporta la imagen modificada a un nuevo archivo BMP
-    bool exportI = exportImage(p2_inv, width, height, archivoSalida);
+    bool exportI = exportImage(io, width, height, archivoSalida);
 
     // Muestra si la exportación fue exitosa (true o false)
     cout << exportI << endl;
 
-    // Libera la memoria usada para los píxeles
-    delete[] id;
-    delete[] p2_inv;
+    // Carga la máscara M.bmp
+    int height3 = 0;
+    int width3 = 0;
+    unsigned char* mask = loadPixels("M.bmp", width3, height3);
+    if (!mask) {
+        cout << " No se pudo cargar M.bmp\n";
+        return -1;
+    }
 
     // Variables para almacenar la semilla y el número de píxeles leídos del archivo de enmascaramiento
+    // Carga los datos de enmascaramiento desde un archivo .txt (semilla + valores RGB)
+    // Carga M1.txt (semilla y valores enmascarados)
     int seed = 0;
     int n_pixels = 0;
+    unsigned int *maskingData = loadSeedMasking("M0.txt", seed, n_pixels);
+    if (!maskingData) {
+        cout << " No se pudo leer M1.txt\n";
+        return -1;
+    }
 
-    // Carga los datos de enmascaramiento desde un archivo .txt (semilla + valores RGB)
-    unsigned int *maskingData = loadSeedMasking("M6.txt", seed, n_pixels);
+    // Compara S(k) = IN[k + seed] + M[k]
+    bool match = true;
+    for (int i = 0; i < n_pixels * 3; ++i) {
+        int suma = int(io[seed + i]) + int(mask[i]);
+        if (suma != int(maskingData[i])) {
+            cout << " Diferencia en byte " << i
+                 << ": esperado " << maskingData[i]
+                 << ", obtenido " << suma << endl;
+            match = false;
+            break;
+        }
+    }
 
+    if (match == true)
+        cout << " IN.bmp coincide con M1.txt al aplicar enmascaramiento.\n";
+    else
+        cout << " IN.bmp NO coincide con M1.txt\n";
     // Muestra en consola los primeros valores RGB leídos desde el archivo de enmascaramiento
     for (int i = 0; i < n_pixels * 3; i += 3) {
         cout << "Pixel " << i / 3 << ": ("
@@ -96,15 +146,17 @@ int main()
              << maskingData[i + 2] << ")" << endl;
     }
 
-    // Libera la memoria usada para los datos de enmascaramiento
-    if (maskingData != nullptr){
-        delete[] maskingData;
-        maskingData = nullptr;
-    }
+    // Libera la memoria
+    delete[] id;
+    delete[] im;
+    delete[] p2_inv;
+    delete[] p1_inv;
+    delete[] io;
+    delete[] mask;
+    delete[] maskingData;
 
     return 0; // Fin del programa
 }
-
 
 unsigned char* loadPixels(QString input, int &width, int &height){
     /*
