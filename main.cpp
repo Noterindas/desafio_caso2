@@ -78,7 +78,7 @@ int main()
 
     unsigned char* dspzar = new unsigned char[total];
 
-    // Función para rotar a la izquierda 3 bits
+    // Función para desplazar
     auto desplazar = [](unsigned char b) {
         return b << 0;
     };
@@ -90,19 +90,17 @@ int main()
 
     unsigned char* p1_inv = new unsigned char[total];
 
-    // Función para rotar a la izquierda 3 bits
+    // Función para rotar
     auto rotar = [](unsigned char b) {
         return b << 3 | (b >> 5);
     };
 
-    // Paso 2: P1 = rotar izquierda 3 bits
     for (int i = 0; i < total; i++) {
         p1_inv[i] = rotar(id[i]);
     }
 
     unsigned char* io = new unsigned char[total];
 
-    // Paso 3: I_O = P1 XOR I_M
     for (int i = 0; i < total; i++) {
         io[i] = p1_inv[i] ^ im[i];
     }
