@@ -76,16 +76,28 @@ int main()
         p2_inv[i] = id[i] ^ im[i];
     }
 
-    unsigned char* p1_inv = new unsigned char[total];
+    unsigned char* dspzar = new unsigned char[total];
 
     // Función para rotar a la izquierda 3 bits
-    auto rotarIzq3 = [](unsigned char b) {
-        return (b << 3) | (b >> 5);
+    auto desplazar = [](unsigned char b) {
+        return b << 0;
     };
 
     // Paso 2: P1 = rotar izquierda 3 bits
     for (int i = 0; i < total; i++) {
-        p1_inv[i] = rotarIzq3(p2_inv[i]);
+        dspzar[i] = desplazar(id[i]);
+    }
+
+    unsigned char* p1_inv = new unsigned char[total];
+
+    // Función para rotar a la izquierda 3 bits
+    auto rotar = [](unsigned char b) {
+        return b << 3 | (b >> 5);
+    };
+
+    // Paso 2: P1 = rotar izquierda 3 bits
+    for (int i = 0; i < total; i++) {
+        p1_inv[i] = rotar(id[i]);
     }
 
     unsigned char* io = new unsigned char[total];
@@ -96,7 +108,7 @@ int main()
     }
 
     // Exporta la imagen modificada a un nuevo archivo BMP
-    bool exportI = exportImage(io, width, height, archivoSalida);
+    bool exportI = exportImage(p1_inv, width, height, archivoSalida);
 
     // Muestra si la exportación fue exitosa (true o false)
     cout << exportI << endl;
@@ -115,7 +127,7 @@ int main()
     // Carga M1.txt (semilla y valores enmascarados)
     int seed = 0;
     int n_pixels = 0;
-    unsigned int *maskingData = loadSeedMasking("M0.txt", seed, n_pixels);
+    unsigned int *maskingData = loadSeedMasking("M6.txt", seed, n_pixels);
     if (!maskingData) {
         cout << " No se pudo leer M1.txt\n";
         return -1;
@@ -124,7 +136,7 @@ int main()
     // Compara S(k) = IN[k + seed] + M[k]
     bool match = true;
     for (int i = 0; i < n_pixels * 3; ++i) {
-        int suma = int(io[seed + i]) + int(mask[i]);
+        int suma = int(p1_inv[seed + i]) + int(mask[i]);
         if (suma != int(maskingData[i])) {
             cout << " Diferencia en byte " << i
                  << ": esperado " << maskingData[i]
@@ -152,6 +164,7 @@ int main()
     delete[] p2_inv;
     delete[] p1_inv;
     delete[] io;
+    delete[] dspzar;
     delete[] mask;
     delete[] maskingData;
 
