@@ -182,8 +182,16 @@ int main()
     int n_pixels = 0;
     unsigned int *maskingData = loadSeedMasking("M0.txt", seed, n_pixels);
     if (!maskingData) {
-        cout << " No se pudo leer M1.txt\n";
+        cout << " No se pudo leer el .txt\n";
         return -1;
+    }
+
+    // Muestra en consola los primeros valores RGB leídos desde el archivo de enmascaramiento
+    for (int i = 0; i < n_pixels * 3; i += 3) {
+        cout << "Pixel " << i / 3 << ": ("
+             << maskingData[i] << ", "
+             << maskingData[i + 1] << ", "
+             << maskingData[i + 2] << ")" << endl;
     }
 
     // Compara S(k) = IN[k + seed] + M[k]
@@ -200,16 +208,9 @@ int main()
     }
 
     if (match == true)
-        cout << " IN.bmp coincide con M1.txt al aplicar enmascaramiento.\n";
+        cout << "IN.bmp coincide con el .txt al aplicar enmascaramiento.\n";
     else
-        cout << " IN.bmp NO coincide con M1.txt\n";
-    // Muestra en consola los primeros valores RGB leídos desde el archivo de enmascaramiento
-    for (int i = 0; i < n_pixels * 3; i += 3) {
-        cout << "Pixel " << i / 3 << ": ("
-             << maskingData[i] << ", "
-             << maskingData[i + 1] << ", "
-             << maskingData[i + 2] << ")" << endl;
-    }
+        cout << "IN.bmp NO coincide con el .txt\n";
 
     // Libera la memoria
     delete[] id;
