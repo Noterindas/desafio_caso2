@@ -1,0 +1,3 @@
+123456789,clave123,Anfitrion,Jose Ramirez,24,5
+987654321,clave456,Huesped,Ana Fernandez,12,5
+456789123,clave789,Huesped,Mario Lopez,9,4

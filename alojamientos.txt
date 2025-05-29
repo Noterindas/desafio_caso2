@@ -1,0 +1,12 @@
+El Rincon Azul,A001,123456789,Antioquia,Guatape,Casa,Calle 1 #2-3,150000,WiFi,TV,Parqueadero
+Balcones del Lago,A002,123456789,Antioquia,Rionegro,Apartamento,Carrera 4 #5-6,120000,Cocina,WiFi
+Casa Jardin Real,A003,123456789,Antioquia,Jardin,Casa,Calle 10 #20-30,90000,WiFi,Desayuno
+Casa Colonial,A004,123456789,Antioquia,Santa Fe de Antioquia,Casa,Calle 45 #33-10,180000,TV,Cocina
+Apartamento La Ceja,A005,123456789,Antioquia,La Ceja,Apartamento,Calle 6 #9-1,160000,Parqueadero,WiFi
+Apartamento Central,A006,123456789,Antioquia,Medellin,Apartamento,Carrera 10 #12-34,200000,WiFi,Desayuno
+Casa Abejorral,A007,123456789,Antioquia,Abejorral,Casa,Calle 3 #7-8,110000,Cocina,TV
+Casa El Retiro,A008,123456789,Antioquia,El Retiro,Casa,Calle 11 #11-11,170000,Parqueadero,WiFi
+Casa Viboral,A009,123456789,Antioquia,Carmen de Viboral,Casa,Carrera 8 #5-5,130000,WiFi
+Apartamento San Rafael,A010,123456789,Antioquia,San Rafael,Apartamento,Calle 12 #9-10,140000,Cocina
+Casa Montanas,A011,123456789,Antioquia,Ituango,Casa,Carrera 15 #6-6,155000,WiFi,TV
+Apartamento Bello Sol,A012,123456789,Antioquia,Bello,Apartamento,Calle 50 #20-30,180000,Cocina,WiFi,TV
